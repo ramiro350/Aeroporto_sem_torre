@@ -54,34 +54,61 @@ public class AviaoDecolando implements Runnable {
 		this.nome = nome;
 	}
 
-	public void run() {
+	public synchronized void run() {
+		while (!p.isFree) {
+			try {
+				System.out.println(Thread.currentThread().getName() + " esperando a pista ficar livre para");
+				wait();
+				notifyAll();
+			} catch (InterruptedException e) {
 
+			}
+		}
+		if (p.avioesdecolaram.size() < 9 && p.avioespousaram.size() < 9) {
+			System.out.println("Todas as operações foram concluídas");
+			System.exit(0);
+		}
+		Decolar();
 	}
 
 	public void Decolar() {
 		while (true) {
 			synchronized (p) {
-				if (p.isFree) {
-					System.out.println("Esperando 5 segundos");
-					System.out.println("Pista em uso por " + Thread.currentThread().getName());
-					// for (int s = 1; s <= 5; s++) {
-					try {
+				// for (int s = 1; s <= 5; s++) {
+				try {
+					if (p.isFree) {
+						System.out.println("Esperando 5 segundos");
+						System.out.println("Pista em uso por " + Thread.currentThread().getName());
 						p.isFree = false;
 						p.notifyAll();
 						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						// e.printStackTrace();
+						System.out.println("Passaram 5 segundos");
+						isFlying1 = true;
+						this.setData_decolagem(new Date(System.currentTimeMillis()));
+						System.out
+								.println(Thread.currentThread().getName() + " decolou às: " + this.getData_decolagem());
+						System.out.println("Aguardando pista ficar livre");
+						Thread.sleep(5000);
+						p.isFree = true;
+						p.notifyAll();
+						for (int i = 0; i <= p.PistaTaxiamento.size(); i++) {
+							if (p.PistaTaxiamento.get(i) == this) {
+								p.PistaTaxiamento.remove(this);
+								notifyAll();
+								System.out
+										.println(Thread.currentThread().getName() + " removido da pista de taxiamento");
+							}
+						}
+					} else {
+						System.out
+								.println("Acidente ocorreu na decolagem do avião: " + Thread.currentThread().getName());
+						notifyAll();
+						return;
 					}
-					// }
-					System.out.println("Passaram 5 segundos");
-                    p.isFree = true;
-                    isFlying1 = true;
-                    System.out.println(Thread.currentThread().getName() + " decolou às: " + new Date(System.currentTimeMillis()));
-				} else {
-					System.out.println("Acidente ocorreu na decolagem do avião: " + Thread.currentThread().getName());
-					notifyAll();
-					return;
+				} catch (InterruptedException e) {
+					// e.printStackTrace();
 				}
+				// }
 			}
 		}
 	}
