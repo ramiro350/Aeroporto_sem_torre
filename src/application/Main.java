@@ -3,6 +3,7 @@ package application;
 import java.util.Scanner;
 
 import entities.AirTraffic;
+import entities.Pista;
 
 
 public class Main {
@@ -11,10 +12,11 @@ public class Main {
 
 		Scanner sc = new Scanner(System.in);
 
+		
 		// ArrayList<AviaoPousando> avioesvoando = new ArrayList<AviaoPousando>(3);
 
-		AirTraffic airtraffic = new AirTraffic();
-		airtraffic.Start();
+		AirTraffic at = new AirTraffic();
+		at.Start();
 
 	}
 }
